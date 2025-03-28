@@ -4,9 +4,27 @@ public class Building{
     static class Lift{
         int liftNo;
         int currentFloor;
+        char dir;    // i - idle, u - upwards, d - downwards
+        int capacity;
+        int currentLoad;
         public Lift(int no, int f){
             this.liftNo = no;
             this.currentFloor = f;
+            this.dir = 'i';
+            this.capacity = 10;
+            this.currentLoad = 0;
+        }
+        public void moveToFloor(int requestedFloor) {
+            if (requestedFloor > currentFloor) {
+                dir = "u";
+            } else if (requestedFloor < currentFloor) {
+                dir = "d";
+            } else {
+                dir = "i";
+            }
+            System.out.println("Lift " + liftNo + " moving " + dir + " to floor " + requestedFloor);
+            currentFloor = requestedFloor;
+            dir = "i";
         }
     }
     static class Floor{
@@ -29,15 +47,19 @@ public class Building{
             }
         }
         public void callLift(int requestedfloor){
-            int min = 9, l=0;
-            for(int i=0;i<8;i++){
-                if(min>Math.abs(lifts[i].currentFloor-requestedfloor)){
-                    l = i;
-                    min = Math.abs(lifts[i].currentFloor-requestedfloor);
+            int min = 9;
+            Lift bestLift = null;
+            for(Lift l:lifts){
+                if(min>Math.abs(l.currentFloor-requestedFloor) && l.currentLoad<l.capacity){
+                    bestLift = l;
+                    min = Math.abs(l.currentFloor-requestedFloor);
                 }
             }
-            System.out.println("lift no. " + (l+1) + " will be called!!");
-            lifts[l].currentFloor = requestedfloor;
+            if(bestLift!=null){
+                bestLift.moveToFloor(requestedFloor);
+            }else{
+                System.out.println("No available lifts at the moment.");
+            }
         }
     }
     public static void main(String args[]){
